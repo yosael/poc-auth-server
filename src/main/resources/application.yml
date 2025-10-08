@@ -1,0 +1,25 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: poc-auth-server
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/${POSTGRES_DB:auth_server_db}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.format_sql: true
+
+app:
+  jwt:
+    issuer: http://localhost:9000
+    access-token-minutes: 15
+    refresh-token-days: 7
+    # Load RSA keys from PEM (env or file). For dev you can paste PEMs into env vars.
+    public-key-pem: ${JWT_PUBLIC_KEY_PEM:}
+    private-key-pem: ${JWT_PRIVATE_KEY_PEM:}
+    key-id: main-rsa-1
