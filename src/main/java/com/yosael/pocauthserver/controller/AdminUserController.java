@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,7 +17,7 @@ public class AdminUserController {
 
   private final AdminUserService adminUserService;
 
-  @PostMapping("/{username}/roles/{role}")
+  @PutMapping("/{username}/roles/{role}")
   public void grantRole(@PathVariable String username, @PathVariable String role) {
     adminUserService.grantRole(username, role);
   }
