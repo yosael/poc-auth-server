@@ -4,8 +4,10 @@ import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.yosael.pocauthserver.config.JwtProperties;
+import java.time.Clock;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -21,28 +23,21 @@ import java.util.UUID;
 public class JwtService {
 
   private final RSAPrivateKey privateKey;
-
-  @Value("${app.jwt.issuer}")
-  private String issuer;
-
-  @Value("${app.jwt.access-token-minutes}")
-  private long accessMinutes;
-
-  @Value("${app.jwt.key-id}")
-  private String keyId;
+  private final JwtProperties props;
+  private final Clock clock;
 
   public String generateAccessToken(Authentication auth) throws JOSEException {
-    Instant now = Instant.now();
-    Instant exp = now.plusSeconds(accessMinutes * 60);
+    Instant now = Instant.now(clock);
+    Instant exp = now.plus(Duration.ofMinutes(props.getAccessTokenMinutes()));
 
     List<String> roles = auth.getAuthorities().stream()
         .map(GrantedAuthority::getAuthority)
-        .map(a -> a.replace("ROLE_", "")) // e.g. ADMIN
+        .map(a -> a.replace("ROLE_", "")) // -> ADMIN, USER, ...
         .toList();
 
     JWTClaimsSet claims = new JWTClaimsSet.Builder()
         .subject(auth.getName())
-        .issuer(issuer)
+        .issuer(props.getIssuer())
         .issueTime(Date.from(now))
         .expirationTime(Date.from(exp))
         .jwtID(UUID.randomUUID().toString())
@@ -50,7 +45,7 @@ public class JwtService {
         .build();
 
     JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
-        .keyID(keyId)
+        .keyID(props.getKeyId())
         .type(JOSEObjectType.JWT)
         .build();
 

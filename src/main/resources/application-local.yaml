@@ -1,0 +1,16 @@
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/${POSTGRES_DB:auth_server_db}
+    username: ${POSTGRES_USER:auth_api_admin}
+    password: ${POSTGRES_PASSWORD:admin01}
+  jpa:
+    show-sql: true
+    properties:
+      hibernate.format_sql: false
+
+app:
+  bootstrap:
+    admin:
+      username: superadmin
+      password: superadmin01

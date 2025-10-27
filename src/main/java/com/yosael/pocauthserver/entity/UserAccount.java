@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.util.Set;
 import java.util.UUID;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Table(name = "users")
@@ -40,7 +41,8 @@ public class UserAccount {
   @Column(nullable = false)
   private boolean enabled;
 
-  @ManyToMany(fetch = FetchType.EAGER)
+  @BatchSize(size = 50)
+  @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "user_roles",
       joinColumns = @JoinColumn(name = "user_id"),

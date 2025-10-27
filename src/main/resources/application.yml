@@ -5,14 +5,19 @@ spring:
   application:
     name: poc-auth-server
   datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/${POSTGRES_DB:auth_server_db}
+    url: jdbc:postgresql://${POSTGRES_HOST}:5432/${POSTGRES_DB}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
-    properties:
-      hibernate.format_sql: true
+    open-in-view: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Since auth-service issues the token, it can also validate it using its own JWKS:
+          jwk-set-uri: http://localhost:9000/.well-known/jwks.json
 
 app:
   jwt:

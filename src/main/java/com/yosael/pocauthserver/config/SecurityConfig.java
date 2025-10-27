@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -46,6 +47,19 @@ public class SecurityConfig {
             .anyRequest().authenticated()
         )
         .httpBasic(Customizer.withDefaults())
+        .oauth2ResourceServer(oauth -> oauth
+            .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter()))
+        )
         .build();
+  }
+
+  private JwtAuthenticationConverter jwtAuthConverter() {
+    var gac = new org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter();
+    gac.setAuthoritiesClaimName("roles");  // we put ["ADMIN","USER"] in the token
+    gac.setAuthorityPrefix("ROLE_");       // becomes ROLE_ADMIN / ROLE_USER
+
+    var conv = new JwtAuthenticationConverter();
+    conv.setJwtGrantedAuthoritiesConverter(gac);
+    return conv;
   }
 }

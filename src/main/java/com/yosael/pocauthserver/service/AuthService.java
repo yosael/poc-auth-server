@@ -32,6 +32,7 @@ public class AuthService {
   private final RoleRepository roles;
   private final PasswordEncoder encoder;
   private final JwtProperties jwtProps;
+  private final String USER_ROLE = "USER";
 
   @Transactional(readOnly = true)
   public TokenResponse login(LoginRequest req) throws Exception {
@@ -50,20 +51,14 @@ public class AuthService {
       throw new UsernameAlreadyExistsException("Username already exists");
     }
 
-    String roleName = Optional.ofNullable(req.role())
-        .filter(s -> !s.isBlank())
-        .map(String::toUpperCase)
-        .orElse("USER");
-
-    Role role = roles.findByName(roleName)
-        .orElseGet(() -> roles.save(Role.builder().name(roleName).build()));
+    Role userRole = roles.findByName(USER_ROLE).orElseGet(() -> roles.save(Role.builder().name(USER_ROLE).build()));
 
     try {
       users.save(UserAccount.builder()
           .username(req.username())
           .passwordHash(encoder.encode(req.password()))
           .enabled(true)
-          .roles(Set.of(role))
+          .roles(Set.of(userRole))
           .build());
     } catch (DataIntegrityViolationException e) {
       // race-condition safe: if two requests create same username at once
