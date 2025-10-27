@@ -155,13 +155,42 @@ Request body:
 }
 ```
 
-Response:
+#### `POST /api/auth/login`
+Authenticates a user and returns a JWT access token.
+Request body:
 ```json
 {
-  "id": "user-uuid",
-  "username": "newuser",
-  "enabled": true,
-  "roles": ["USER"]
+  "username": "existinguser",
+  "password": "cleartextpassword"
 }
 ```
 
+### Protected (Admin)
+
+All endpoints below require `ROLE_ADMIN` in the JWT.
+
+#### `GET /api/admin/users`
+
+Search users with optional filters (username, role, enabled).
+
+Query parameters:
+- `q` (optional)
+- `role` (optional)
+- `enabled` (optional)
+- `page` (optional, default 0)
+- `size` (optional, default 20)
+- `sort` (optional, e.g., `username,asc`)
+
+#### `PUT /api/admin/users/{id}/roles/{roleName}`
+Assigns a role to a user.
+Path parameters:
+- `id`: User ID (UUID)
+- `roleName`: Role name (e.g., `ADMIN`, `USER`)
+- No request body.
+
+#### `DELETE /api/admin/users/{id}/roles/{roleName}`
+Removes a role from a user.
+Path parameters:
+- `id`: User ID (UUID)
+- `roleName`: Role name (e.g., `ADMIN`, `USER`)
+- No request body.
